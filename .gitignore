@@ -1,0 +1,26 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# PyTorch and HuggingFace caches
+.cache/
+~/.cache/huggingface/
+
+# Data and large model checkpoints
+data/
+checkpoints/
+*.pt
+*.pth
+*.bin
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pyd
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
