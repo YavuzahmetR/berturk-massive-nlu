@@ -1,6 +1,6 @@
-# 🇹🇷 Turkish Joint NLU
+#  Turkish Joint NLU
 
-**Turkish Natural Language Understanding (NLU) system** — a production-ready, end-to-end project that performs both **intent classification** and **slot filling** in a single model.
+**Turkish Natural Language Understanding (NLU) system** — a project that performs both **intent classification** and **slot filling** in a single model.
 
 Built on BERTurk, servable via FastAPI, tuned with Optuna.
 
@@ -22,15 +22,15 @@ Built on BERTurk, servable via FastAPI, tuned with Optuna.
 
 ## ✨ Features
 
-- 🎯 **Joint Architecture** — Intent and slot predictions from a single BERTurk forward pass
-- 🇹🇷 **BERTurk** — `dbmdz/bert-base-turkish-cased` pre-trained model
-- 📊 **Comprehensive Evaluation** — Intent F1 + entity-level Slot F1 (seqeval)
-- 🔒 **Leakage-free Pipeline** — Strict train / validation / test split
-- ⚡ **Optimized Training** — AMP, early stopping, class weights support
-- 🧪 **Optuna Tuning** — Automatic hyperparameter search pipeline
-- 🌐 **FastAPI Server** — Single and batch inference endpoints, Swagger UI
-- 💻 **CLI + Interactive Mode** — Quick testing from the terminal
-- 🪟 **Windows Compatible** — `num_workers=0` fallback, optional AMP
+-  **Joint Architecture** — Intent and slot predictions from a single BERTurk forward pass
+-  **BERTurk** — `dbmdz/bert-base-turkish-cased` pre-trained model
+-  **Comprehensive Evaluation** — Intent F1 + entity-level Slot F1 (seqeval)
+-  **Leakage-free Pipeline** — Strict train / validation / test split
+-  **Optimized Training** — AMP, early stopping, class weights support
+-  **Optuna Tuning** — Automatic hyperparameter search pipeline
+-  **FastAPI Server** — Single and batch inference endpoints, Swagger UI
+-  **CLI + Interactive Mode** — Quick testing from the terminal
+
 
 ---
 
@@ -305,18 +305,18 @@ curl -X POST http://localhost:8000/predict \
 ```bash
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
-  -d '{"text": "rabia'\''nın hayranıyım bu şarkıdan sonra onun şarkılarından çal"}'
+  -d '{"text": "rabiask hayranıyım bu şarkıdan sonra onun şarkılarından çal"}'
 ```
 
 **Response:**
 
 ```json
 {
-  "text": "rabia'nın hayranıyım bu şarkıdan sonra onun şarkılarından çal",
+  "text": "rabiask hayranıyım bu şarkıdan sonra onun şarkılarından çal",
   "intent": "play_music",
   "confidence": 0.9959,
   "entities": [
-    {"type": "artist_name", "text": "rabia'nın", "start": 0, "end": 9}
+    {"type": "artist_name", "text": "rabiask", "start": 0, "end": 9}
   ]
 }
 ```
@@ -549,7 +549,7 @@ We ran **10 trials** with Optuna:
 The Massive dataset marks slots with square brackets:
 
 ```
-"şu an ciddi [artist_name : adele] hayranıyım"
+"ciddi [artist_name : rabiask] hayranıyım"
 ```
 
 `MassiveAnnotationParser`:
@@ -562,13 +562,7 @@ The Massive dataset marks slots with square brackets:
 3. Converts to BIO format: `B-artist_name`, `I-artist_name`, `O`
 4. Uses `-100` (ignore index) for padding and special tokens
 
----
 
-## 📄 License
-
-MIT License
-
----
 
 ## 🙏 Acknowledgements
 
@@ -579,6 +573,3 @@ MIT License
 
 ---
 
-## 📬 Contact
-
-Feel free to open an issue for questions, suggestions, or contributions.
