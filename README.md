@@ -1,4 +1,4 @@
-# 🇹🇷 Turkish Joint NLU
+#  Turkish Joint NLU
 
 **Turkish Natural Language Understanding (NLU) system** — a production-ready, end-to-end project that performs both **intent classification** and **slot filling** in a single model.
 
@@ -22,15 +22,15 @@ Built on BERTurk, servable via FastAPI, tuned with Optuna.
 
 ## ✨ Features
 
-- 🎯 **Joint Architecture** — Intent and slot predictions from a single BERTurk forward pass
-- 🇹🇷 **BERTurk** — `dbmdz/bert-base-turkish-cased` pre-trained model
-- 📊 **Comprehensive Evaluation** — Intent F1 + entity-level Slot F1 (seqeval)
-- 🔒 **Leakage-free Pipeline** — Strict train / validation / test split
-- ⚡ **Optimized Training** — AMP, early stopping, class weights support
-- 🧪 **Optuna Tuning** — Automatic hyperparameter search pipeline
-- 🌐 **FastAPI Server** — Single and batch inference endpoints, Swagger UI
-- 💻 **CLI + Interactive Mode** — Quick testing from the terminal
-- 🪟 **Windows Compatible** — `num_workers=0` fallback, optional AMP
+-  **Joint Architecture** — Intent and slot predictions from a single BERTurk forward pass
+-  **BERTurk** — `dbmdz/bert-base-turkish-cased` pre-trained model
+-  **Comprehensive Evaluation** — Intent F1 + entity-level Slot F1 (seqeval)
+-  **Leakage-free Pipeline** — Strict train / validation / test split
+-  **Optimized Training** — AMP, early stopping, class weights support
+-  **Optuna Tuning** — Automatic hyperparameter search pipeline
+-  **FastAPI Server** — Single and batch inference endpoints, Swagger UI
+-  **CLI + Interactive Mode** — Quick testing from the terminal
+
 
 ---
 
@@ -579,6 +579,3 @@ MIT License
 
 ---
 
-## 📬 Contact
-
-Feel free to open an issue for questions, suggestions, or contributions.
