@@ -549,7 +549,7 @@ We ran **10 trials** with Optuna:
 The Massive dataset marks slots with square brackets:
 
 ```
-"şu an ciddi [artist_name : adele] hayranıyım"
+"ciddi [artist_name : rabiask] hayranıyım"
 ```
 
 `MassiveAnnotationParser`:
