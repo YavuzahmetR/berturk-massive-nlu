@@ -1,0 +1,19 @@
+# Robust Turkish Joint NLU Configuration Contract
+
+model:
+  model_name: "dbmdz/bert-base-turkish-cased"  # Shared BERTurk backbone
+  dropout_rate: 0.1                             # Stabilization dropout ratio
+  max_length: 64                                # Sequence length token limit
+
+training:
+  batch_size: 16                                # Optimization packet size
+  epochs: 10                                    # Total full training passes over dataset
+  learning_rate: 0.00003                        # Initial AdamW learning rate (3e-5)
+  weight_decay: 0.01                            # L2 regularization for overfit prevention
+  warmup_ratio: 0.1                             # Linear learning rate warmup phase ratio
+  max_grad_norm: 1.0                            # Gradient explosion protection limit
+  seed: 42                                      # Deterministic random state
+
+loss:
+  lambda_slot: 1.0                              # Multi-task loss balance weight
+  slot_pad_idx: -100                            # Attention mask token ignore index
