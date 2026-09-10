@@ -87,7 +87,7 @@ def main():
 
     # Keep track of the best validation loss for checkpointing
     best_val_loss = float("inf")
-    model_save_path = "best_joint_nlu_model.pt"
+    model_save_path = "checkpoints/best_joint_nlu_model.pt"
 
     # 8. Optimization Execution Loop (Epoch blocks)
     for epoch in range(cfg["training"]["epochs"]):
