@@ -312,11 +312,11 @@ curl -X POST http://localhost:8000/predict \
 
 ```json
 {
-  "text": "rabia'nın hayranıyım bu şarkıdan sonra onun şarkılarından çal",
+  "text": "rabiask hayranıyım bu şarkıdan sonra onun şarkılarından çal",
   "intent": "play_music",
   "confidence": 0.9959,
   "entities": [
-    {"type": "artist_name", "text": "rabia'nın", "start": 0, "end": 9}
+    {"type": "artist_name", "text": "rabiask", "start": 0, "end": 9}
   ]
 }
 ```
