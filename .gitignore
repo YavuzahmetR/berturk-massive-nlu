@@ -18,3 +18,9 @@ checkpoints/*.pt
 # OS
 .DS_Store
 Thumbs.db
+
+tune.log
+train_final.log
+train_v1.log
+train_v3.log
+*.log
