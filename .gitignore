@@ -1,27 +1,20 @@
-# Python virtual environments
-.venv/
-venv/
-env/
-
-# PyTorch and HuggingFace caches
-.cache/
-~/.cache/huggingface/
-
-# Data and large model checkpoints
-data/raw/
-data/processed/
-checkpoints/
-*.pt
-*.pth
-*.bin
-
-# Python artifacts
+# Python
 __pycache__/
-*.pyc
-*.pyo
-.pyd
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+CACHEDIR.TAG
+venv/
+.venv/
 
-# IDEs and OS files
+# Model checkpoints
+checkpoints/*.pt
+!checkpoints/.gitkeep
+
+# IDE
 .vscode/
 .idea/
+
+# OS
 .DS_Store
+Thumbs.db
