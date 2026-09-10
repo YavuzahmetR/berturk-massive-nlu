@@ -305,7 +305,7 @@ curl -X POST http://localhost:8000/predict \
 ```bash
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
-  -d '{"text": "rabia'\''nın hayranıyım bu şarkıdan sonra onun şarkılarından çal"}'
+  -d '{"text": "rabiask hayranıyım bu şarkıdan sonra onun şarkılarından çal"}'
 ```
 
 **Response:**
@@ -562,13 +562,7 @@ The Massive dataset marks slots with square brackets:
 3. Converts to BIO format: `B-artist_name`, `I-artist_name`, `O`
 4. Uses `-100` (ignore index) for padding and special tokens
 
----
 
-## 📄 License
-
-MIT License
-
----
 
 ## 🙏 Acknowledgements
 
