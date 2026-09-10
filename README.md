@@ -1,6 +1,6 @@
 #  Turkish Joint NLU
 
-**Turkish Natural Language Understanding (NLU) system** — a production-ready, end-to-end project that performs both **intent classification** and **slot filling** in a single model.
+**Turkish Natural Language Understanding (NLU) system** — a project that performs both **intent classification** and **slot filling** in a single model.
 
 Built on BERTurk, servable via FastAPI, tuned with Optuna.
 
