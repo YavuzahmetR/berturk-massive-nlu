@@ -8,7 +8,8 @@ env/
 ~/.cache/huggingface/
 
 # Data and large model checkpoints
-data/
+data/raw/
+data/processed/
 checkpoints/
 *.pt
 *.pth
