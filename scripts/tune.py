@@ -242,7 +242,7 @@ def main():
             intent_counts, slot_counts, device,
         )
 
-    # 10 trial yeterli (hizli bitirelim)
+    # 10 trials
     study.optimize(objective, n_trials=10)
 
     print("\n" + "=" * 70)
