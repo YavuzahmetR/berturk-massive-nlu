@@ -159,11 +159,11 @@ def run_single(text, model, tokenizer, id_to_intent, id_to_slot, device, max_len
     print(f"🎯 Intent : {intent}  (confidence: {conf * 100:.2f}%)")
 
     if entities:
-        print("🏷️  Slots  :")
+        print(" Slots  :")
         for ent in entities:
             print(f"     • {ent['type']:<20s} -> \"{ent['text']}\"")
     else:
-        print("🏷️  Slots  : (yok)")
+        print(" Slots  : (none)")
 
 
 if __name__ == "__main__":
