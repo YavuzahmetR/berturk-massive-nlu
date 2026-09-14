@@ -33,7 +33,7 @@ def load_local_jsonl(file_path: str) -> list:
 
 
 def run_final_test_evaluation():
-    print("🔒 [FINAL EVALUATION] Evaluating on the Locked Official Test Split...\n")
+    print("[FINAL EVALUATION] Evaluating on the Locked Official Test Split...\n")
 
     # 1. Load configuration metadata
     config_path = os.path.join("configs", "joint_bert.yaml")
@@ -109,7 +109,7 @@ def run_final_test_evaluation():
     correct_slot_tokens = 0
     total_valid_slot_tokens = 0
 
-    print(f"⏳ Running inference over {len(test_dataset)} unseen test instances...")
+    print(f"Running inference over {len(test_dataset)} unseen test instances...")
 
     with torch.no_grad():
         for batch in test_loader:
@@ -166,7 +166,7 @@ def run_final_test_evaluation():
 
     # ================= PRINT REPORTS =================
     print("\n" + "=" * 70)
-    print("📊 FINAL LOCKED TEST METRICS — INTENT")
+    print("FINAL LOCKED TEST METRICS — INTENT")
     print("=" * 70)
     print(f"  Accuracy  : {intent_acc * 100:.2f}%")
     print(f"  Precision : {intent_p * 100:.2f}%  (weighted)")
@@ -174,7 +174,7 @@ def run_final_test_evaluation():
     print(f"  F1        : {intent_f1 * 100:.2f}%  (weighted)")
 
     print("\n" + "=" * 70)
-    print("🏷️  FINAL LOCKED TEST METRICS — SLOT (entity-level)")
+    print("FINAL LOCKED TEST METRICS — SLOT (entity-level)")
     print("=" * 70)
     print(f"  Precision : {slot_p * 100:.2f}%")
     print(f"  Recall    : {slot_r * 100:.2f}%")
@@ -182,7 +182,7 @@ def run_final_test_evaluation():
     print(f"  ── Token-level accuracy (baseline): {slot_token_acc * 100:.2f}%")
 
     print("\n" + "=" * 70)
-    print("📋 DETAILED INTENT CLASSIFICATION REPORT (per-class)")
+    print("INTENT CLASSIFICATION REPORT (per-class)")
     print("=" * 70)
     target_names = [id_to_intent[i] for i in sorted(id_to_intent.keys())]
     print(
@@ -197,11 +197,11 @@ def run_final_test_evaluation():
     )
 
     print("\n" + "=" * 70)
-    print("📋 DETAILED SLOT CLASSIFICATION REPORT (per-entity, seqeval)")
+    print("SLOT CLASSIFICATION REPORT (per-entity, seqeval)")
     print("=" * 70)
     print(seqeval_report(all_slot_true_seqs, all_slot_pred_seqs, zero_division=0, digits=3))
 
-    print("\n👑 [DONE] Full evaluation complete.")
+    print("\n [DONE] Full evaluation complete.")
 
 
 if __name__ == "__main__":
