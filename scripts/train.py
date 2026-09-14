@@ -30,7 +30,7 @@ def load_local_jsonl(file_path: str) -> list:
 
 
 def compute_class_weights(dataset, num_classes: int, key: str, pad_idx: int = None, cap: float = None):
-    """Eğitim verisinden sınıf frekanslarına göre ağırlık hesaplar."""
+   """Compute class weights from the training set based on label frequencies."""
     counts = torch.zeros(num_classes, dtype=torch.float)
     for i in range(len(dataset)):
         item = dataset[i]
@@ -93,7 +93,7 @@ def main():
         max_length=cfg["model"]["max_length"],
     )
 
-    # 5. DataLoaders (optimize edilmiş)
+    # 5. DataLoaders 
     train_loader = DataLoader(
         train_dataset,
         batch_size=cfg["training"]["batch_size"],
