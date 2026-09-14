@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from src.inference import NLUPredictor
 
-# ---------------- Pydantic schemas ----------------
+# Pydantic schemas
 
 class PredictRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=512, description="Kullanıcı cümlesi")
@@ -35,7 +35,7 @@ class BatchPredictResponse(BaseModel):
     count: int
 
 
-# ---------------- Lifespan: modeli bir kez yükle ----------------
+# Lifespan
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,7 +54,7 @@ app = FastAPI(
 )
 
 
-# ---------------- Endpoints ----------------
+# Endpoints
 
 @app.get("/", tags=["health"])
 def root():
