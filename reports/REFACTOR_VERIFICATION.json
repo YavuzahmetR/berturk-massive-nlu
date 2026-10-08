@@ -1,0 +1,386 @@
+{
+  "purpose": "Readability refactor verification, not a new model performance experiment",
+  "date": "2026-10-08",
+  "baseline_commit": "d7ccd95a86f91c80ecb6fddb91b8e870ff959c9c",
+  "external_checkpoint": {
+    "external_artifact_source_commit": "4b72b6bf6ea585e1845084e53d36ee54a5af15a4",
+    "checkpoint_sha256": "daf393caece62ca84756ed09059c04a12f16573318e0faad42006010597a8ff6",
+    "checkpoint_bytes": 443081631,
+    "mapping_hashes": {
+      "intent_to_id.json": "ca0842aacaf75c4f426559ee88c563560f905f0ccbb03cb14d08b2f4a33a19c6",
+      "slot_to_id.json": "b2c260b2addb43b2a18c7a62b1b31727e7a7e19a153ca7b690d9a3f1ff7e0dca"
+    },
+    "config_sha256": "48eea0ff7a4b736aa3c3e2205237fbcfa6239e5a3d98a90e8359cbe3a4ebe886"
+  },
+  "manual_parity": {
+    "status": "passed",
+    "checks": [
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "src/modeling/joint_nlu_model.py",
+          "to": "src/data/annotations.py",
+          "symbols": [
+            "MassiveAnnotationParser",
+            "TokenAlignmentEncoder"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "src/modeling/joint_nlu_model.py",
+          "to": "src/modeling/joint_nlu_model.py",
+          "symbols": [
+            "JointTurkishNLUModel"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "src/data/dataset.py",
+          "to": "src/data/dataset.py",
+          "symbols": [
+            "MassiveJointNLUDataset",
+            "joint_nlu_collate_fn"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "src/modeling/losses.py",
+          "to": "src/modeling/losses.py",
+          "symbols": [
+            "JointNLULoss"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "src/inference/predictor.py",
+          "to": "src/inference/predictor.py",
+          "symbols": [
+            "decode_bio_entities",
+            "NLUPredictor"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "scripts/predict.py",
+          "to": "src/inference/cli_predictor.py",
+          "symbols": [
+            "load_artifacts",
+            "decode_bio_entities",
+            "predict"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "scripts/predict.py",
+          "to": "scripts/predict.py",
+          "symbols": [
+            "main",
+            "run_single"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "scripts/evaulate_model.py",
+          "to": "src/evaluation/evaluate.py",
+          "symbols": [
+            "run_final_test_evaluation"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "scripts/tune.py",
+          "to": "src/training/tune.py",
+          "symbols": [
+            "compute_class_weights_from_counts",
+            "precompute_label_counts",
+            "evaluate_f1",
+            "train_one_trial",
+            "main"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "scripts/generate_slot_mapping.py",
+          "to": "src/data/labels.py",
+          "symbols": [
+            "generate_canonical_slots"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "data/prepare_dataset.py",
+          "to": "src/data/prepare.py",
+          "symbols": [
+            "run_dataset_preflight_and_manifest"
+          ]
+        }
+      },
+      {
+        "check": "AST operations identical",
+        "status": "passed",
+        "details": {
+          "from": "api/app.py",
+          "to": "api/app.py",
+          "symbols": [
+            "PredictRequest",
+            "BatchPredictRequest",
+            "EntitySpan",
+            "PredictResponse",
+            "BatchPredictResponse",
+            "root",
+            "health",
+            "predict",
+            "predict_batch"
+          ]
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "data/raw/train.jsonl",
+          "sha256": "683c1310a26a8dc1e3baea6218d605e9ea26ae9c5e8f94028f22c511689b2321"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "data/raw/validation.jsonl",
+          "sha256": "762f3cc850c38c3e3924ca7236d3e6dcaf1706b259cd28abc820d57d60c75fb4"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "data/raw/test.jsonl",
+          "sha256": "0138dfb238251ab53bd1e511d8aa14250f8fb26d764ab2f3431e1dfcb782608d"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "data/processed/intent_to_id.json",
+          "sha256": "ca0842aacaf75c4f426559ee88c563560f905f0ccbb03cb14d08b2f4a33a19c6"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "data/processed/slot_to_id.json",
+          "sha256": "b2c260b2addb43b2a18c7a62b1b31727e7a7e19a153ca7b690d9a3f1ff7e0dca"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "configs/joint_bert.yaml",
+          "sha256": "48eea0ff7a4b736aa3c3e2205237fbcfa6239e5a3d98a90e8359cbe3a4ebe886"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "tests/test_alignment.py",
+          "sha256": "1bb4ad1b5601f5b7756e8e06c04372d5f1be47f352ae9d114d0d90847f3e2ca5"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "tests/test_pipeline.py",
+          "sha256": "416862ddf371365041a890943e74edf4bb5fefa06b752691a59c1f8d568dc850"
+        }
+      },
+      {
+        "check": "unchanged file hash",
+        "status": "passed",
+        "details": {
+          "path": "api/app.py",
+          "sha256": "1a25ff1ae9f08c6dd99693cbec5be2cd4f74e6ee8caf2d21e5e9591d555f6088"
+        }
+      },
+      {
+        "check": "fixed text parsing and offset alignment",
+        "status": "passed",
+        "details": {
+          "samples": 5
+        }
+      },
+      {
+        "check": "fixed Dataset filtering, label resolution and collate",
+        "status": "passed",
+        "details": {
+          "valid": 3,
+          "invalid": 4
+        }
+      },
+      {
+        "check": "both original decoders",
+        "status": "passed",
+        "details": {
+          "cases_per_decoder": 4,
+          "kept_separate": true
+        }
+      },
+      {
+        "check": "model heads with identical fixed encoder and weights",
+        "status": "passed",
+        "details": {
+          "intent_shape": [
+            2,
+            2
+          ],
+          "slot_shape": [
+            2,
+            4,
+            5
+          ]
+        }
+      },
+      {
+        "check": "joint loss including optional weighting and smoothing",
+        "status": "passed",
+        "details": null
+      },
+      {
+        "check": "fixed CPU training epoch: exact loss, updated weights, scheduler and validation",
+        "status": "passed",
+        "details": {
+          "training_loss_sum": 7.08413028717041,
+          "validation_loss_sum": 3.5856494903564453
+        }
+      },
+      {
+        "check": "class-weight helper: same frequency, normalization and cap",
+        "status": "passed",
+        "details": null
+      },
+      {
+        "check": "retained split row count",
+        "status": "passed",
+        "details": {
+          "split": "train",
+          "rows": 11514
+        }
+      },
+      {
+        "check": "retained split row count",
+        "status": "passed",
+        "details": {
+          "split": "validation",
+          "rows": 2033
+        }
+      },
+      {
+        "check": "retained split row count",
+        "status": "passed",
+        "details": {
+          "split": "test",
+          "rows": 2974
+        }
+      },
+      {
+        "check": "retained official split row IDs are disjoint",
+        "status": "passed",
+        "details": null
+      },
+      {
+        "check": "all current Python sources parse",
+        "status": "passed",
+        "details": null
+      }
+    ]
+  },
+  "real_checkpoint_samples": {
+    "status": "passed",
+    "device": "cpu",
+    "samples": 8,
+    "checks": [
+      "Published-baseline, local-artifact and refactored label bytes match",
+      "External artifact configuration matches unchanged published configuration",
+      "API batch predictions exactly equal",
+      "API single prediction exactly equal",
+      "CLI predictions including confidence and entities exactly equal",
+      "Intent and slot logits torch.equal",
+      "Checkpoint state_dict key contract identical"
+    ],
+    "predictions_sha256": "aa081ef0d56f5775f43c8f2132244a5ccafc8bb2ef11203b6c7f1e68302a4779"
+  },
+  "existing_tests": {
+    "alignment": {
+      "status": "passed",
+      "count": 3,
+      "offline_cache": true
+    },
+    "manual_full_model_preflight": {
+      "status": "passed",
+      "offline_cache": true,
+      "historical_checkpoint_test": false
+    }
+  },
+  "entrypoint_input_reads": {
+    "status": "passed",
+    "entrypoints": [
+      "train",
+      "tune",
+      "evaluate"
+    ],
+    "stopped_before_tokenizer_model_or_training": true
+  },
+  "undefined_names": {
+    "status": "passed",
+    "command": "ruff check --select F821 ."
+  },
+  "environment": {
+    "python": "3.12.13",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.6",
+    "device": "cpu",
+    "model_access": "Existing offline cache"
+  },
+  "limitations": [
+    "Local artifact is from a different repository HEAD than the published baseline; this is recorded, not assumed identical historical provenance.",
+    "Historical full test metrics and original training runtime were not rerun.",
+    "No training on the real dataset, CUDA execution or AMP-overflow experiment was performed.",
+    "Fixed-encoder checks complement separate real checkpoint sample checks; complete historical metrics and runtime were not rerun.",
+    "Actual CUDA AMP-overflow execution was not exercised."
+  ]
+}

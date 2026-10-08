@@ -4,7 +4,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from src.inference import NLUPredictor
+from src.inference.predictor import NLUPredictor
 
 # Pydantic schemas
 

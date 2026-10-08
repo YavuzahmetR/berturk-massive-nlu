@@ -1,0 +1,844 @@
+{
+  "date": "2026-10-09",
+  "scope": "Requested software-test/tool/package-initializer cleanup; scientific evaluation preserved",
+  "comparison_baseline": "Reviewed readability snapshot immediately before this cleanup",
+  "baseline_archive_sha256": "ef26cd8b4c1d0e30de21141943a4ffe325d96126936c24bb696e680c70390e9a",
+  "removed_files": [
+    {
+      "path": "tests/test_alignment.py",
+      "reason": "Requested removal of software test suite",
+      "sha256": "1bb4ad1b5601f5b7756e8e06c04372d5f1be47f352ae9d114d0d90847f3e2ca5"
+    },
+    {
+      "path": "tests/test_pipeline.py",
+      "reason": "Requested removal of software test suite",
+      "sha256": "416862ddf371365041a890943e74edf4bb5fefa06b752691a59c1f8d568dc850"
+    },
+    {
+      "path": "tests/__pycache__/test_alignment.cpython-312-pytest-9.1.1.pyc",
+      "reason": "Requested removal of software test suite",
+      "sha256": "1b0e5f36d82c2d42a404a484d4fc82c9e1b83fc4b6ccb4fa519db8839d5b28f6"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline.cpython-312.pyc",
+      "reason": "Requested removal of software test suite",
+      "sha256": "9e6b0d2e1aa1f909f705208ee7a2199194d494245f57c5d7bb24d9eefc5f8118"
+    },
+    {
+      "path": "src/__init__.py",
+      "reason": "Requested removal of package initializer; explicit module imports retained",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "path": "src/data/__init__.py",
+      "reason": "Requested removal of package initializer; explicit module imports retained",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "path": "src/evaluation/__init__.py",
+      "reason": "Requested removal of package initializer; explicit module imports retained",
+      "sha256": "5fc75fc5df0586bd0f9814c147bff0d3c84c7fe1797c37d041e2cfc4563d039d"
+    },
+    {
+      "path": "src/inference/__init__.py",
+      "reason": "Requested removal of package initializer; explicit module imports retained",
+      "sha256": "d5f8f6816f616879f6c637b69ada4e99350bdca44f8009ef704975ec72d3226f"
+    },
+    {
+      "path": "src/modeling/__init__.py",
+      "reason": "Requested removal of package initializer; explicit module imports retained",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "path": "src/training/__init__.py",
+      "reason": "Requested removal of package initializer; explicit module imports retained",
+      "sha256": "72de06503dd0bd2a1ce57a166d00b6e405d91804cbc432a913668904d4d41c57"
+    },
+    {
+      "path": ".pytest_cache/.gitignore",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd"
+    },
+    {
+      "path": ".pytest_cache/CACHEDIR.TAG",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4"
+    },
+    {
+      "path": ".pytest_cache/README.md",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad"
+    },
+    {
+      "path": ".pytest_cache/v/cache/nodeids",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "46d6f6785aaa7661b19fb9cbe7beb83ec640fbb97537982a6a1ac947140c2f9e"
+    },
+    {
+      "path": "api/__pycache__/app.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "776c0cfe55cb303b98564ccead56b4afc430865bd32d215dbdbd4fe95cb39642"
+    },
+    {
+      "path": "data/__pycache__/prepare_dataset.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "dd7b415a50f4588d15f338c357635dcbeea19f04ec32c35140aa3db54ff3d2f5"
+    },
+    {
+      "path": "scripts/__pycache__/evaluate_model.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "6786064ef296e52f2e2f29ed8b4967e35d6009f1577e69011713eee1e2ce46f4"
+    },
+    {
+      "path": "scripts/__pycache__/evaulate_model.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "b191e2cece5045754e0fff6cfcd0eca7922f94e8a4904ed1ab772690207048e8"
+    },
+    {
+      "path": "scripts/__pycache__/generate_slot_mapping.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "a0eb996df8e63569425421b36dd6378b151d8b6067b045976b51249fc5eec191"
+    },
+    {
+      "path": "scripts/__pycache__/predict.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "a9a0fd2d753175f7e1df41c352f0b90c5c2988cd2a37be982231aeb200c610fd"
+    },
+    {
+      "path": "scripts/__pycache__/prepare_data.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "405c8bae305a1f18dc9fef606c50fd2b475e209e6f4850a7ecc4b26f3d9985d9"
+    },
+    {
+      "path": "scripts/__pycache__/train.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "697ff9e6461f242ea8ec72504ecc3ea65d72ece301c4b682ab73df0ae126e6ab"
+    },
+    {
+      "path": "scripts/__pycache__/tune.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "62a64f5d3407b2afb8ce2be0c5aa40e1a3300b021a4ce099d5a2844d6db74524"
+    },
+    {
+      "path": "src/__pycache__/__init__.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "fad0c852938ebd322c746cbb2221cb10ceda70736e30f7a6d73f0c31f3d007be"
+    },
+    {
+      "path": "src/data/__pycache__/__init__.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "218beec8e0bc4fad2e40d0760867176396a4a89dfbf3cd596a6111e380e2e71c"
+    },
+    {
+      "path": "src/data/__pycache__/annotations.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "86c4fff4441ef13bd2c3eaec49acb21b2d7de30dcfb61cb1ef35f2fc515076b6"
+    },
+    {
+      "path": "src/data/__pycache__/dataset.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "d3ff88071d5a6cda26f08544f22508d54a7ee2bc6adbb9a6d02b88be4a45b094"
+    },
+    {
+      "path": "src/data/__pycache__/io.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "bcd890c16b9ce357700f7f882bf6e78c414f219ce876f8b829960023e9f91b8f"
+    },
+    {
+      "path": "src/data/__pycache__/labels.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "0596e98821a0a05c8da1947d2f06c8ea107da4edcd74629d74d15f9a1d0e0701"
+    },
+    {
+      "path": "src/data/__pycache__/prepare.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "775e34f55c5b24e6011fc78e31205ac71a9802263c68f0643e1d2ebfb0451f6c"
+    },
+    {
+      "path": "src/evaluation/__pycache__/__init__.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "44047d352656283b74208027603e369c9037c8916d6ca54bc85b60e24b00bffb"
+    },
+    {
+      "path": "src/evaluation/__pycache__/evaluate.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "aeb04571859176850baafefba4f69c8c329910b67c1a535a96b8f12628e2f410"
+    },
+    {
+      "path": "src/inference/__pycache__/__init__.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "ac6344204fd8a3b6ca45d44e71f81672aa36b29fc6650d32779320e43a6b8d18"
+    },
+    {
+      "path": "src/inference/__pycache__/cli_predictor.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "4d86a853ac4e1b96c340275983603ecfaf4d9c995d103f874ad95c86654ad8a6"
+    },
+    {
+      "path": "src/inference/__pycache__/predictor.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "88918cc16e50d40525a8f7f0a2789bb6a36a68d2e4ee8535fd37bea083d6789f"
+    },
+    {
+      "path": "src/modeling/__pycache__/__init__.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "e6ad955ab3dd719372983f21700da57251acdd9eb9498cc97e371ca480e7278e"
+    },
+    {
+      "path": "src/modeling/__pycache__/joint_nlu_model.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "f4658f1c89164195169efeaac9db4653af3d685a0d4edaa32ab89c3396772602"
+    },
+    {
+      "path": "src/modeling/__pycache__/losses.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "dc0ee9d7696f6ab48be770d580297f29acc146c369fc199d1c62308f03d7f5e3"
+    },
+    {
+      "path": "src/training/__pycache__/__init__.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "17dfafc107b4c3dba96ae268f039f0088136bd8b8c7fe61763471b27f3cb0c94"
+    },
+    {
+      "path": "src/training/__pycache__/train.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "b7bb53704df043b31860afc3771e368a8156d40d46e865c15d27ec65e80774a4"
+    },
+    {
+      "path": "src/training/__pycache__/tune.cpython-312.pyc",
+      "reason": "Generated Python or removed test-tool cache",
+      "sha256": "66ac96b863d5374ead4f8c101ead6f95f0aee5c485f38e196ed5a8f39921db54"
+    }
+  ],
+  "docker_files_found": [],
+  "package_initializer_files_remaining": [],
+  "software_test_files_remaining": [],
+  "runtime_source_changed": [
+    "api/app.py"
+  ],
+  "runtime_operations_changed": [],
+  "runtime_source_deleted": [],
+  "syntax_errors": [],
+  "protected_files": [
+    {
+      "path": "configs/joint_bert.yaml",
+      "sha256": "48eea0ff7a4b736aa3c3e2205237fbcfa6239e5a3d98a90e8359cbe3a4ebe886",
+      "unchanged": true
+    },
+    {
+      "path": "data/processed/intent_to_id.json",
+      "sha256": "ca0842aacaf75c4f426559ee88c563560f905f0ccbb03cb14d08b2f4a33a19c6",
+      "unchanged": true
+    },
+    {
+      "path": "data/processed/slot_to_id.json",
+      "sha256": "b2c260b2addb43b2a18c7a62b1b31727e7a7e19a153ca7b690d9a3f1ff7e0dca",
+      "unchanged": true
+    },
+    {
+      "path": "data/raw/test.jsonl",
+      "sha256": "0138dfb238251ab53bd1e511d8aa14250f8fb26d764ab2f3431e1dfcb782608d",
+      "unchanged": true
+    },
+    {
+      "path": "data/raw/train.jsonl",
+      "sha256": "683c1310a26a8dc1e3baea6218d605e9ea26ae9c5e8f94028f22c511689b2321",
+      "unchanged": true
+    },
+    {
+      "path": "data/raw/validation.jsonl",
+      "sha256": "762f3cc850c38c3e3924ca7236d3e6dcaf1706b259cd28abc820d57d60c75fb4",
+      "unchanged": true
+    },
+    {
+      "path": "reports/HISTORICAL_RESULTS.md",
+      "sha256": "8f8a581ef01f79a07fdddcb482bc8579728014ff91551374eca1a37bbe9b87dc",
+      "unchanged": true
+    },
+    {
+      "path": "reports/REFACTOR_VERIFICATION.json",
+      "sha256": "3406b2aa1cb6b92668cafb2a2c66b1a7de357f8e0204d2dfbcebef28b470f37c",
+      "unchanged": true
+    }
+  ],
+  "http_comparison": {
+    "exact_calls_match": true,
+    "call_count": 17,
+    "external_model_sha256": "daf393caece62ca84756ed09059c04a12f16573318e0faad42006010597a8ff6",
+    "calls": [
+      {
+        "method": "GET",
+        "path": "/",
+        "input": null,
+        "status": 200,
+        "output": {
+          "service": "Turkish Joint NLU API",
+          "status": "ok",
+          "docs": "/docs"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "input": null,
+        "status": 200,
+        "output": {
+          "status": "ok",
+          "device": "cpu",
+          "num_intents": 60,
+          "num_slots": 111
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/docs",
+        "input": null,
+        "status": 200,
+        "output": {
+          "swagger_ui": true
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": "yarÄ±n sabah yediye alarm kurar mÄ±sÄ±n"
+        },
+        "status": 200,
+        "output": {
+          "text": "yarÄ±n sabah yediye alarm kurar mÄ±sÄ±n",
+          "intent": "alarm_set",
+          "confidence": 0.992397129535675,
+          "entities": [
+            {
+              "type": "date",
+              "text": "yarÄ±n",
+              "start": 0,
+              "end": 5
+            },
+            {
+              "type": "time",
+              "text": "sabah yediye",
+              "start": 6,
+              "end": 18
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": "bugÃ¼n istanbulda hava nasÄ±l olacak"
+        },
+        "status": 200,
+        "output": {
+          "text": "bugÃ¼n istanbulda hava nasÄ±l olacak",
+          "intent": "weather_query",
+          "confidence": 0.9989638328552246,
+          "entities": [
+            {
+              "type": "date",
+              "text": "bugÃ¼n",
+              "start": 0,
+              "end": 5
+            },
+            {
+              "type": "place_name",
+              "text": "istanbulda",
+              "start": 6,
+              "end": 16
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": "mÃ¼zik aÃ§"
+        },
+        "status": 200,
+        "output": {
+          "text": "mÃ¼zik aÃ§",
+          "intent": "play_music",
+          "confidence": 0.9663544297218323,
+          "entities": []
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict/batch",
+        "input": {
+          "texts": [
+            "mÃ¼zik aÃ§",
+            "alarm kur"
+          ]
+        },
+        "status": 200,
+        "output": {
+          "results": [
+            {
+              "text": "mÃ¼zik aÃ§",
+              "intent": "play_music",
+              "confidence": 0.9663543701171875,
+              "entities": []
+            },
+            {
+              "text": "alarm kur",
+              "intent": "alarm_set",
+              "confidence": 0.9979081153869629,
+              "entities": []
+            }
+          ],
+          "count": 2
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": ""
+        },
+        "status": 422,
+        "output": {
+          "detail": [
+            {
+              "type": "string_too_short",
+              "loc": [
+                "body",
+                "text"
+              ],
+              "msg": "String should have at least 1 character",
+              "input": "",
+              "ctx": {
+                "min_length": 1
+              }
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "status": 422,
+        "output": {
+          "detail": [
+            {
+              "type": "string_too_long",
+              "loc": [
+                "body",
+                "text"
+              ],
+              "msg": "String should have at most 512 characters",
+              "input": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "ctx": {
+                "max_length": 512
+              }
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {},
+        "status": 422,
+        "output": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "text"
+              ],
+              "msg": "Field required",
+              "input": {}
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": 42
+        },
+        "status": 422,
+        "output": {
+          "detail": [
+            {
+              "type": "string_type",
+              "loc": [
+                "body",
+                "text"
+              ],
+              "msg": "Input should be a valid string",
+              "input": 42
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict/batch",
+        "input": {
+          "texts": []
+        },
+        "status": 422,
+        "output": {
+          "detail": [
+            {
+              "type": "too_short",
+              "loc": [
+                "body",
+                "texts"
+              ],
+              "msg": "List should have at least 1 item after validation, not 0",
+              "input": [],
+              "ctx": {
+                "field_type": "List",
+                "min_length": 1,
+                "actual_length": 0
+              }
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict/batch",
+        "input": {
+          "texts": [
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§",
+            "mÃ¼zik aÃ§"
+          ]
+        },
+        "status": 422,
+        "output": {
+          "detail": [
+            {
+              "type": "too_long",
+              "loc": [
+                "body",
+                "texts"
+              ],
+              "msg": "List should have at most 64 items after validation, not 65",
+              "input": [
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§",
+                "mÃ¼zik aÃ§"
+              ],
+              "ctx": {
+                "field_type": "List",
+                "max_length": 64,
+                "actual_length": 65
+              }
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict/batch",
+        "input": {
+          "texts": [
+            ""
+          ]
+        },
+        "status": 200,
+        "output": {
+          "results": [
+            {
+              "text": "",
+              "intent": "news_query",
+              "confidence": 0.21500353515148163,
+              "entities": []
+            }
+          ],
+          "count": 1
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict/batch",
+        "input": {
+          "texts": [
+            "yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n "
+          ]
+        },
+        "status": 200,
+        "output": {
+          "results": [
+            {
+              "text": "yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n yarÄ±n ",
+              "intent": "qa_factoid",
+              "confidence": 0.18713074922561646,
+              "entities": [
+                {
+                  "type": "date",
+                  "text": "yarÄ±n yarÄ±n yarÄ±n",
+                  "start": 0,
+                  "end": 17
+                }
+              ]
+            }
+          ],
+          "count": 1
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "input": null,
+        "status": 200,
+        "output": {
+          "status": "loading",
+          "device": null,
+          "num_intents": null,
+          "num_slots": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/predict",
+        "input": {
+          "text": "mÃ¼zik aÃ§"
+        },
+        "status": 503,
+        "output": {
+          "detail": "Model not loaded yet."
+        }
+      }
+    ]
+  },
+  "namespace_packages_discovered": [
+    "api",
+    "scripts",
+    "src",
+    "src.data",
+    "src.evaluation",
+    "src.inference",
+    "src.modeling",
+    "src.training"
+  ],
+  "import_checks": [
+    {
+      "module": "src.data.annotations",
+      "status": "imported"
+    },
+    {
+      "module": "src.data.dataset",
+      "status": "imported"
+    },
+    {
+      "module": "src.data.io",
+      "status": "imported"
+    },
+    {
+      "module": "src.data.prepare",
+      "status": "not_run_missing_verification_dependency",
+      "missing_dependency": "datasets"
+    },
+    {
+      "module": "src.data.labels",
+      "status": "imported"
+    },
+    {
+      "module": "src.modeling.joint_nlu_model",
+      "status": "imported"
+    },
+    {
+      "module": "src.modeling.losses",
+      "status": "imported"
+    },
+    {
+      "module": "src.training.train",
+      "status": "imported"
+    },
+    {
+      "module": "src.training.tune",
+      "status": "imported"
+    },
+    {
+      "module": "src.evaluation.evaluate",
+      "status": "imported"
+    },
+    {
+      "module": "src.inference.predictor",
+      "status": "imported"
+    },
+    {
+      "module": "src.inference.cli_predictor",
+      "status": "imported"
+    },
+    {
+      "module": "scripts.train",
+      "status": "imported"
+    },
+    {
+      "module": "scripts.tune",
+      "status": "imported"
+    },
+    {
+      "module": "scripts.evaluate_model",
+      "status": "imported"
+    },
+    {
+      "module": "scripts.evaulate_model",
+      "status": "imported"
+    },
+    {
+      "module": "scripts.prepare_data",
+      "status": "not_run_missing_verification_dependency",
+      "missing_dependency": "datasets"
+    },
+    {
+      "module": "scripts.generate_slot_mapping",
+      "status": "imported"
+    },
+    {
+      "module": "scripts.predict",
+      "status": "imported"
+    },
+    {
+      "module": "data.prepare_dataset",
+      "status": "not_run_missing_verification_dependency",
+      "missing_dependency": "datasets"
+    }
+  ],
+  "limits": [
+    "A bounded CPU inference comparison is not full training or a latency benchmark",
+    "Model checkpoints are external, not bundled with the Git checkout",
+    "Scientific historical metrics were not recomputed",
+    "Preparation imports requiring datasets were not run in this verification environment; dependency remains declared in both install manifests"
+  ]
+}

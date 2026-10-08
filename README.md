@@ -1,575 +1,219 @@
-#  Turkish Joint NLU
+# Turkish Joint NLU with BERTurk
 
-**Turkish Natural Language Understanding (NLU) system** — a project that performs both **intent classification** and **slot filling** in a single model.
+A joint model for **Turkish intent classification and slot filling**. One BERTurk encoder feeds two classifiers. The repository includes training, evaluation, optional Optuna search, terminal inference and a local FastAPI interface.
 
-Built on BERTurk, servable via FastAPI, tuned with Optuna.
+## Overview
 
----
+The input is a Turkish utterance such as `yarın sabah yediye alarm kur`. The outputs are an intent label, its model confidence and entity spans such as `date` and `time`. The project uses the Turkish `tr-TR` portion of Amazon MASSIVE and `dbmdz/bert-base-turkish-cased`.
 
-## 📌 Table of Contents
+Preparation preserves the official train/validation/test partitions. It checks expected row counts and overlapping row IDs; this is useful protection, but it does not prove that every possible form of leakage is absent.
 
-- [Features](#-features)
-- [Metrics](#-metrics)
-- [Architecture](#-architecture)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Optuna Experience & Lessons Learned](#-optuna-experience--lessons-learned)
-- [Technical Details](#-technical-details)
-- [License](#-license)
+## Scope and limitations
 
----
+- This is a supervised NLU study and local inference demo, with a fixed intent and slot vocabulary.
+- A valid API response does not establish production readiness or robustness on arbitrary Turkish input.
+- Inference truncates at 64 tokenizer tokens. Confidence is the intent softmax score, not calibrated certainty.
+- The trained checkpoint is not included in the source checkout. A separately supplied local checkpoint was used for bounded before/after prediction checks. Full historical metric provenance is still incomplete.
+- API and CLI preserve their original, different BIO decoding rules. Entity spans can differ on consecutive subwords. They stay separate to avoid changing predictions during this refactor.
+- Historical test results have already been inspected. Running the same test again is a historical re-evaluation, not a new unseen evaluation.
 
-## ✨ Features
+## Architecture and workflow
 
--  **Joint Architecture** — Intent and slot predictions from a single BERTurk forward pass
--  **BERTurk** — `dbmdz/bert-base-turkish-cased` pre-trained model
--  **Comprehensive Evaluation** — Intent F1 + entity-level Slot F1 (seqeval)
--  **Leakage-free Pipeline** — Strict train / validation / test split
--  **Optimized Training** — AMP, early stopping, class weights support
--  **Optuna Tuning** — Automatic hyperparameter search pipeline
--  **FastAPI Server** — Single and batch inference endpoints, Swagger UI
--  **CLI + Interactive Mode** — Quick testing from the terminal
-
-
----
-
-## 📊 Metrics
-
-**Locked Test Split** (2,974 examples, fully unseen):
-
-| Version | Intent F1 | Slot F1 | Slot Precision | Slot Recall |
-|---|---|---|---|---|
-| **v1** (baseline) | 87.54% | 73.94% | 72.25% | 75.70% |
-| **v3** (final) ⭐ | **87.99%** | **74.16%** | **72.34%** | **76.06%** |
-| Optuna Best Trial | — | 68.75% | — | — |
-
-**Improvements in v3 over v1:**
-
-| Change | Reason |
-|---|---|
-| `lambda_slot: 1.0 → 1.5` | More weight on slot loss, F1 ↑ |
-| `warmup_ratio: 0.1 → 0.15` | BERT fine-tuning stability |
-| `dropout_rate: 0.1 → 0.12` | Slight regularization |
-
-**Gain:** Intent +0.45 points, Slot +0.22 points.
-
----
-
-## 🏗️ Architecture
-
-```
-                    ┌─────────────────────┐
-                    │   Input Text        │
-                    │   "yarın alarm kur" │
-                    └──────────┬──────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │   BERTurk Tokenizer │
-                    └──────────┬──────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │   BERTurk Encoder   │
-                    │   (12-layer, 768d)  │
-                    └──────────┬──────────┘
-                               │
-                ┌──────────────┴──────────────┐
-                │                             │
-     ┌──────────▼──────────┐      ┌───────────▼───────────┐
-     │  [CLS] Pooler Head  │      │  Token Classification │
-     │  ── Intent ──       │      │  ── Slot (BIO) ──     │
-     │  Dropout + Linear   │      │  Dropout + Linear     │
-     └─────────────────────┘      └───────────────────────┘
-              │                              │
-       60 intent classes              55 slot labels
-       (CrossEntropy)                 (BIO CrossEntropy)
+```mermaid
+flowchart TD
+    A[Annotated MASSIVE text] --> B[Clean text and character spans]
+    B --> C[BERTurk tokenizer and offsets]
+    C --> D[BIO labels aligned to tokens]
+    C --> E[BERTurk encoder]
+    E --> F[First-token hidden state: intent classifier]
+    E --> G[Token hidden states: slot classifier]
+    D --> H[Joint cross-entropy loss during training]
+    F --> H
+    G --> H
+    F --> I[Intent argmax and softmax confidence]
+    G --> J[Token argmax and BIO entity decoding]
 ```
 
-**Loss Function:**
+The intent head uses `last_hidden_state[:, 0, :]`; it does **not** use BERT's separate `pooler_output`. The encoder has 12 layers and 768 hidden dimensions. The intent head has 60 outputs. There are 55 raw slot types, represented by **111 BIO labels**: `O`, plus `B-` and `I-` for each type.
 
+```text
+total_loss = intent_cross_entropy + lambda_slot * slot_cross_entropy
+lambda_slot = 1.5
+slot_padding_ignore_index = -100
 ```
-Total Loss = Intent Loss + λ_slot × Slot Loss
 
-λ_slot = 1.5 (more weight on slot)
-```
+## Project layout
 
----
-
-## 📁 Project Structure
-
-```
-turkish-nlu/
-├── api/
-│   └── app.py                    # FastAPI server
-├── checkpoints/
-│   └── best_joint_nlu_model.pt   # Best trained checkpoint
-├── configs/
-│   └── joint_bert.yaml           # Training configuration
-├── data/
-│   ├── raw/                      # Raw JSONL splits
-│   │   ├── train.jsonl
-│   │   ├── validation.jsonl
-│   │   └── test.jsonl
-│   └── processed/                # Label mappings
-│       ├── intent_to_id.json
-│       └── slot_to_id.json
-├── scripts/
-│   ├── train.py                  # Training script
-│   ├── evaluate_model.py         # Test evaluation
-│   ├── predict.py                # CLI inference
-│   ├── tune.py                   # Optuna hyperparameter search
-│   └── generate_slot_mapping.py  # Slot mapping generator
-├── src/
-│   ├── data/
-│   │   └── dataset.py            # PyTorch Dataset + Collate
-│   ├── modeling/
-│   │   ├── joint_nlu_model.py    # Main model + Parser + Encoder
-│   │   └── losses.py             # Joint loss function
-│   └── inference/
-│       └── predictor.py          # Shared NLU predictor
-├── tests/
-│   ├── test_alignment.py         # Slot alignment test
-│   └── test_pipeline.py          # End-to-end pipeline test
+```text
+berturk-massive-nlu/
+├── src/                         # Core behavior, grouped by learning step
+│   ├── data/                    # Parsing, alignment, JSONL, mappings, Dataset
+│   ├── modeling/                # Joint neural model and loss
+│   ├── training/                # Training epochs and optional Optuna search
+│   ├── evaluation/              # Existing test metric calculation
+│   └── inference/               # API predictor and original CLI decoder
+├── scripts/                     # python -m scripts.<command> entry points
+├── api/app.py                   # Thin FastAPI interface
+├── configs/joint_bert.yaml       # Used model/training/loss settings
+├── data/raw/                    # Unchanged official JSONL partitions
+├── data/processed/              # Unchanged intent and BIO ID mappings
+├── reports/                     # Recorded historical result provenance
+├── docs/                        # Reading guide, refactor notes, API examples
 ├── pyproject.toml
-├── requirements.txt
-└── README.md
+└── requirements.txt
 ```
 
----
+`data/prepare_dataset.py` and the original misspelled `scripts/evaulate_model.py` remain compatibility entry points. Generated `checkpoints/` is not a versioned model artifact.
 
-## 🚀 Installation
+## Data and artifacts
 
-### Requirements
+| Item | Location / meaning |
+|---|---|
+| Train | `data/raw/train.jsonl`, 11,514 expected rows |
+| Validation | `data/raw/validation.jsonl`, 2,033 expected rows |
+| Test | `data/raw/test.jsonl`, 2,974 expected rows |
+| Intents | `data/processed/intent_to_id.json`, 60 IDs |
+| Slots | `data/processed/slot_to_id.json`, 111 BIO IDs |
+| Model config | `configs/joint_bert.yaml` |
+| Training/API/evaluation checkpoint | `checkpoints/best_joint_nlu_model.pt`, externally supplied |
+| Original CLI checkpoint | `best_joint_nlu_model.pt` in repo root, externally supplied |
+| Historical result record | [reports/HISTORICAL_RESULTS.md](reports/HISTORICAL_RESULTS.md) |
 
-- Python 3.10+
-- CUDA 12.1+ (optional, for GPU)
-- 4 GB+ VRAM (tested on RTX 3050 laptop)
+The two checkpoint paths are an existing inconsistency. No fallback was added, because it could silently select a different model. Use the same externally supplied checkpoint bytes at the path required by the command. Retraining does not recreate identical historical weights.
 
-### Steps
+Raw records and label mappings are retained byte-for-byte. Preparation commands can overwrite them, so they are for deliberate data preparation, not a required step before every evaluation.
+
+## Setup
+
+Python 3.10+ is required. A GPU is optional. The historical README described an RTX 3050 laptop with 4 GB VRAM; this refactor does not establish a new hardware benchmark.
 
 ```bash
-# 1) Clone the repo
-git clone <repo-url>
-cd turkish-nlu
-
-# 2) Virtual environment
-python -m venv venv
-source venv/bin/activate         # Linux/Mac
-# or
-venv\Scripts\activate            # Windows
-
-# 3) Dependencies
-pip install -r requirements.txt
-
-# 4) (For GPU) CUDA-enabled PyTorch
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-
-# 5) Install package (for import paths)
-pip install -e .
+git clone https://github.com/YavuzahmetR/berturk-massive-nlu.git
+cd berturk-massive-nlu
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# PowerShell: .\.venv\Scripts\Activate.ps1
+python -m pip install -e "."
 ```
 
----
+`requirements.txt` is the alternative dependency list. Install a compatible PyTorch build for your device if needed. Neither declaration locks the original training environment, so a fresh install is not an exact recreation of that experiment. Preparation needs `datasets`. Model/tokenizer access or a matching cache is required for the original `from_pretrained` calls.
 
-## 💻 Usage
+Run commands from the repo root. Original relative artifact paths are retained.
 
-### 1. Training
+## Usage
+
+### Data preparation, when explicitly needed
+
+```bash
+python -m scripts.prepare_data
+python -m scripts.generate_slot_mapping
+```
+
+These fetch and verify official partitions, save JSONL files, and derive BIO IDs from training metadata. Existing compatibility command: `python -m data.prepare_dataset`.
+
+### Training
 
 ```bash
 python -m scripts.train
-```
-
-With a custom config:
-
-```bash
 python -m scripts.train --config configs/joint_bert.yaml
 ```
 
-**Duration:** ~10-12 minutes (RTX 3050 laptop)
+Saves the state with the lowest validation loss. Historical runtime estimate: 10–12 minutes on the author's RTX 3050 laptop; not remeasured here.
 
----
-
-### 2. Evaluation
+### Evaluation
 
 ```bash
 python -m scripts.evaluate_model
 ```
 
-**Output:**
+Corrected spelling is available; `python -m scripts.evaulate_model` stays supported. Prints test metrics and per-class reports; it does not currently export a machine-readable release report.
 
-```
-📊 FINAL LOCKED TEST METRICS — INTENT
-  Accuracy  : 88.03%
-  F1        : 87.99%  (weighted)
-
-🏷️  FINAL LOCKED TEST METRICS — SLOT (entity-level)
-  Precision : 72.34%
-  Recall    : 76.06%
-  F1        : 74.16%
-  ── Token-level accuracy (baseline): 90.54%
-```
-
----
-
-### 3. CLI Inference
+### Terminal inference
 
 ```bash
 python -m scripts.predict "yarın sabah yediye alarm kurar mısın"
-```
-
-**Output:**
-
-```
-📝 Sentence: yarın sabah yediye alarm kurar mısın
-------------------------------------------------------------
-🎯 Intent : alarm_set  (confidence: 99.85%)
-🏷️  Slots  :
-     • date                 -> "yarın"          [0:5]
-     • time                 -> "sabah yediye"   [6:18]
-------------------------------------------------------------
-```
-
-Interactive mode:
-
-```bash
 python -m scripts.predict
 ```
 
----
+The second opens interactive input. Enter `q`, `quit` or `exit` to leave. This command preserves the legacy root checkpoint path and CLI decoder.
 
-### 4. REST API
+### Local API
 
 ```bash
-uvicorn api.app:app --reload --host 0.0.0.0 --port 8000
+uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
 ```
 
-**Swagger UI:** `http://localhost:8000/docs`
-
-**Endpoints:**
-
-| Method | Path | Description |
+| Method | Path | Purpose |
 |---|---|---|
-| GET | `/` | Service info |
-| GET | `/health` | Health check |
-| POST | `/predict` | Single-sentence inference |
-| POST | `/predict/batch` | Batch inference (up to 64 texts) |
+| GET | `/` | Service information |
+| GET | `/health` | Load status, device and label counts |
+| POST | `/predict` | One sentence |
+| POST | `/predict/batch` | Up to 64 sentences |
 
----
+Swagger UI: `http://localhost:8000/docs`. Responses retain `text`, `intent`, `confidence`, `entities`; batches retain `results` and `count`. The model loads once on startup. An empty single-sentence request returns validation error 422. [API requests and Python client](docs/API_EXAMPLES.md) are illustrations, not fresh measurements.
+See [API review and first-run steps](docs/API_REVIEW.md) for measured request/response behavior, required external files and known inconsistencies.
 
-#### 🩺 `GET /health` — Health Check
-
-```bash
-curl http://localhost:8000/health
-```
-
-**Response:**
-
-```json
-{
-  "status": "ok",
-  "device": "cuda",
-  "num_intents": 60,
-  "num_slots": 55
-}
-```
-
----
-
-#### 🎯 `POST /predict` — Single Sentence
-
-**Request:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": "yarın sabah yediye alarm kurar mısın"}'
-```
-
-**Response:**
-
-```json
-{
-  "text": "yarın sabah yediye alarm kurar mısın",
-  "intent": "alarm_set",
-  "confidence": 0.9924,
-  "entities": [
-    {"type": "date", "text": "yarın", "start": 0, "end": 5},
-    {"type": "time", "text": "sabah yediye", "start": 6, "end": 18}
-  ]
-}
-```
-
----
-
-**Request 2 — Music intent:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": "rabiask hayranıyım bu şarkıdan sonra onun şarkılarından çal"}'
-```
-
-**Response:**
-
-```json
-{
-  "text": "rabiask hayranıyım bu şarkıdan sonra onun şarkılarından çal",
-  "intent": "play_music",
-  "confidence": 0.9959,
-  "entities": [
-    {"type": "artist_name", "text": "rabiask", "start": 0, "end": 9}
-  ]
-}
-```
-
----
-
-**Request 3 — Weather query:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": "bugün istanbulda hava nasıl olacak"}'
-```
-
-**Response:**
-
-```json
-{
-  "text": "bugün istanbulda hava nasıl olacak",
-  "intent": "weather_query",
-  "confidence": 0.9990,
-  "entities": [
-    {"type": "date", "text": "bugün", "start": 0, "end": 5},
-    {"type": "place_name", "text": "istanbulda", "start": 6, "end": 16}
-  ]
-}
-```
-
----
-
-**Request 4 — Location recommendation:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Taksim'\''de gezebileceğim önemli mekanlar var mı"}'
-```
-
-**Response:**
-
-```json
-{
-  "text": "Taksim'de gezebileceğim önemli mekanlar var mı",
-  "intent": "recommendation_locations",
-  "confidence": 0.7059,
-  "entities": [
-    {"type": "place_name", "text": "Taksim'de", "start": 0, "end": 9}
-  ]
-}
-```
-
----
-
-#### 📦 `POST /predict/batch` — Batch Inference
-
-**Request:**
-
-```bash
-curl -X POST http://localhost:8000/predict/batch \
-  -H "Content-Type: application/json" \
-  -d '{
-    "texts": [
-      "hava nasıl",
-      "müzik aç",
-      "alarm kur",
-      "istanbulda ne yenir"
-    ]
-  }'
-```
-
-**Response:**
-
-```json
-{
-  "results": [
-    {
-      "text": "hava nasıl",
-      "intent": "weather_query",
-      "confidence": 0.9984,
-      "entities": []
-    },
-    {
-      "text": "müzik aç",
-      "intent": "play_music",
-      "confidence": 0.9664,
-      "entities": []
-    },
-    {
-      "text": "alarm kur",
-      "intent": "alarm_set",
-      "confidence": 0.9979,
-      "entities": []
-    },
-    {
-      "text": "istanbulda ne yenir",
-      "intent": "recommendation_locations",
-      "confidence": 0.9253,
-      "entities": [
-        {"type": "place_name", "text": "istanbulda", "start": 0, "end": 10}
-      ]
-    }
-  ],
-  "count": 4
-}
-```
-
----
-
-#### ⚠️ Error Response — Empty Input
-
-**Request:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": ""}'
-```
-
-**Response (422 Unprocessable Entity):**
-
-```json
-{
-  "detail": [
-    {
-      "type": "string_too_short",
-      "loc": ["body", "text"],
-      "msg": "String should have at least 1 character",
-      "input": ""
-    }
-  ]
-}
-```
-
----
-
-#### 🐍 Python Client Example
-
-```python
-import requests
-
-API_URL = "http://localhost:8000"
-
-
-def predict(text: str) -> dict:
-    r = requests.post(f"{API_URL}/predict", json={"text": text}, timeout=10)
-    r.raise_for_status()
-    return r.json()
-
-
-def predict_batch(texts: list) -> list:
-    r = requests.post(f"{API_URL}/predict/batch", json={"texts": texts}, timeout=30)
-    r.raise_for_status()
-    return r.json()["results"]
-
-
-if __name__ == "__main__":
-    # Single sentence
-    result = predict("yarın sabah yediye alarm kurar mısın")
-    print(f"Intent: {result['intent']} ({result['confidence']:.2%})")
-    for ent in result["entities"]:
-        print(f"  {ent['type']:<15s} -> {ent['text']!r}")
-
-    # Batch
-    print("\n--- Batch ---")
-    for item in predict_batch(["hava nasıl", "müzik aç", "alarm kur"]):
-        print(f"{item['text']:<15s} -> {item['intent']} ({item['confidence']:.2%})")
-```
-
----
-
-### 5. Hyperparameter Tuning (Optuna)
+### Optional Optuna study
 
 ```bash
 python -m scripts.tune
 ```
 
-Runs 10 trials and saves the best config to `configs/joint_bert_best.yaml`. **Duration:** ~40-50 min.
+Runs 10 trials and saves `configs/joint_bert_best.yaml`. Historical runtime estimate: 40–50 minutes. Search evaluates **validation entity-level slot F1**, uses four epochs per trial, batch size 16, AMP off, warmup ratio 0.1, TPE sampling and MedianPruner. These settings differ from normal ten-epoch training.
 
----
+## Evaluation protocol
 
-## 🧪 Optuna Experience & Lessons Learned
-
-We ran **10 trials** with Optuna:
-
-| Trial | Slot F1 | Parameters |
-|---|---|---|
-| **Trial 0** | **0.6875** | lr=1.8e-5, dropout=0.29, CW=none |
-| Trial 1 | 0.1793 | CW=both → **collapsed** |
-| Trial 2 | 0.6404 | lr=1.4e-5, dropout=0.10 |
-| Trial 3-6 | — | Pruned (early-stopped) |
-
-**Optuna's best trial (0.6875) could not beat the manual baseline (0.7394).**
-
-### Why?
-
-1. **High dropout (0.29)** — Made it harder to learn slot boundaries (B-X, I-X)
-2. **Label smoothing** — Smoothens intent but hurts slot
-3. **Val loss ≠ Slot F1** — Optuna was guided by the wrong metric
-
-### Takeaways
-
-| Finding | Decision |
+| Stage | Selection or metric |
 |---|---|
-| ✅ Class weights collapse slot F1 | Keep disabled |
-| ✅ High dropout hurts | 0.1-0.12 range is optimal |
-| ✅ Label smoothing hurts slot | Keep disabled |
-| ✅ Baseline (v1) is already strong | Light tuning is enough |
+| Normal training | Lowest average validation batch loss; patience 3 |
+| Optuna search | Highest validation entity-level slot F1 |
+| Final intent evaluation | Accuracy, **weighted** precision/recall/F1; per-class report |
+| Final slot evaluation | Entity-level precision/recall/F1 with `seqeval` |
+| Secondary slot measure | Token accuracy excluding labels `-100` |
 
-**A negative result is still a result.** The v3 config is the product of these lessons.
+Intent weighted-F1 is not macro-F1. Slot entity F1 is not token accuracy. Validation search and test results must remain separate. Evaluation uses token argmax and ignores padding/special labels; it does not use the API's entity decoder to calculate `seqeval` F1.
 
----
+Unchanged supplied settings: dropout 0.12, maximum length 64, batch size 16, up to 10 epochs, AdamW learning rate `3e-5`, weight decay 0.01, warmup 15%, maximum gradient norm 1.0, seed 42. AMP, class weights and label smoothing are off. Supported code paths do not mean they were enabled in the recorded final experiment.
 
-## 🛠️ Technical Details
+## Results and interpretation
 
-### Model Architecture
+These values were **reported by the original README**, not recomputed or verified against checkpoint hashes during this refactor:
 
-| Layer | Detail |
-|---|---|
-| **Encoder** | BERTurk base cased (12-layer, 768 hidden) |
-| **Intent Head** | `[CLS]` pooler → Dropout(0.12) → Linear(768, 60) |
-| **Slot Head** | Token hidden → Dropout(0.12) → Linear(768, 55) |
-| **Loss** | CE (intent) + 1.5 × CE (slot, ignore=-100) |
-| **Optimizer** | AdamW (lr=3e-5, wd=0.01) |
-| **Scheduler** | Linear warmup (15%) + linear decay |
-| **Max Length** | 64 tokens |
-| **Batch Size** | 16 |
+| Historical version | Split | Intent weighted-F1 | Slot entity F1 | Slot precision | Slot recall |
+|---|---|---|---|---|---|
+| v1 reference model | Reported test | 87.54% | 73.94% | 72.25% | 75.70% |
+| v3 model | Reported test | 87.99% | 74.16% | 72.34% | 76.06% |
+| Optuna best trial | Validation search | — | 68.75% | — | — |
 
-### Slot Alignment
+Reported v3 gains: intent +0.45 percentage points, slot +0.22 points. Original v3 example also records intent accuracy 88.03% and slot token accuracy 90.54%. No uncertainty estimates are stored. v1 is an earlier neural reference, not a classical baseline.
 
-The Massive dataset marks slots with square brackets:
+Reported v3 changes: slot-loss weight `1.0 → 1.5`, warmup `0.1 → 0.15`, dropout `0.1 → 0.12`. Proposed explanations for them are training hypotheses rather than isolated causal findings.
 
-```
-"ciddi [artist_name : rabiask] hayranıyım"
+Optuna history: trial 0 validation slot F1 0.6875 (`lr=1.8e-5`, dropout 0.29, no weights), trial 1 0.1793 (both weights), trial 2 0.6404 (`lr=1.4e-5`, dropout 0.10), trials 3–6 pruned. One weak trial does not show that class weights always fail. Label smoothing in the current loss applies to **intent**, not directly to slots. Current search optimizes validation slot F1; the old claim that it used validation loss is inaccurate for this source.
+
+Search 0.6875 cannot be fairly compared with v1 **test** 0.7394. Full trial logs, original checkpoints and their hashes are absent. [Historical provenance](reports/HISTORICAL_RESULTS.md) retains the numbers and remaining limits.
+
+## Verification
+
+The layout changes include two operational repairs: the training indentation error and the missing correctly spelled evaluation entry point. The earlier checks were recorded on 8 October 2026. The repository does not distribute a software test suite; recorded outcomes remain historical evidence.
+
+Manual baseline comparisons cover parsing, alignment, filtering, collate tensors, both BIO decoders, model-head behavior with a fixed encoder, loss and a training/validation epoch. They compare with the original source, correcting only its indentation error when reading the baseline. A fixed encoder does not substitute for the actual pretrained model or trained checkpoint.
+
+With the supplied local checkpoint and real cached BERTurk tokenizer/encoder, eight fixed CPU samples produced **exactly equal** original/refactored logits and API/CLI outputs, including confidences and entity spans. Single and batch API results were checked separately. The supplied artifact comes from local commit `4b72b6b`, whereas the source baseline is `d7ccd95`; identical label/config bytes and the checkpoint hash are recorded separately.
+
+Before removal, the three tokenizer alignment tests and manual full-model preflight passed offline. Full historical test metrics, training trajectory and real runtime were not rerun or certified unchanged. See [machine-readable historical checks](reports/REFACTOR_VERIFICATION.json).
+
+For a quick local syntax check:
+
+```bash
+python -m compileall -q src scripts api data/prepare_dataset.py
 ```
 
-`MassiveAnnotationParser`:
-1. Removes the slot markers → clean text
-2. Extracts character offsets → `[(5, 10, "artist_name")]`
+Use `/docs` to try the service after supplying the checkpoint and pretrained model/tokenizer cache or access. The cleanup compares fixed real-checkpoint HTTP responses before and after removal and checks namespace imports/package discovery. It does not change or remove the scientific `data/raw/test.jsonl` partition or its evaluation command. See [cleanup results](docs/CLEANUP_RESULTS.json) and [API review](docs/API_REVIEW.md).
 
-`TokenAlignmentEncoder`:
-1. Reads the tokenizer's `offset_mapping`
-2. Aligns each slot span to tokens
-3. Converts to BIO format: `B-artist_name`, `I-artist_name`, `O`
-4. Uses `-100` (ignore index) for padding and special tokens
+## Design choices
 
+The code uses ordinary functions and small PyTorch classes. Parsing and alignment are separate from the neural model. Epoch functions keep optimizer, AMP and scheduler order explicit.
+Imports point directly to their modules. Python namespace packages allow this layout without package `__init__.py` files; class constructors named `__init__` remain necessary.
 
-
-## 🙏 Acknowledgements
-
-- **Massive Dataset** — Amazon Alexa + Turkish community contribution
-- **BERTurk** — `dbmdz` (Bekir Karahan, Stefan Schweter)
-- **Hugging Face Transformers** — Model and tokenizer infrastructure
-- **Optuna** — Hyperparameter search
-
----
-
+Credits: Amazon MASSIVE, BERTurk (`dbmdz`), Hugging Face Transformers, PyTorch, Optuna and FastAPI. No repository license file is present.
