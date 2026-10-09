@@ -84,7 +84,7 @@ def decode_bio_entities(
 class NLUPredictor:
     """
     Eğitilmiş Joint NLU modelini bir kez yükler ve predict / predict_batch sunar.
-    FastAPI gibi çoklu istek alan ortamlarda güvenle paylaşılabilir.
+    API başlangıcında bir kez oluşturulur; eşzamanlı erişim garantisi vermez.
     """
 
     def __init__(

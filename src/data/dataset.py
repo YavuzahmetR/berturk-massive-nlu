@@ -5,7 +5,9 @@ from typing import List, Dict, Any
 
 class MassiveJointNLUDataset(Dataset):
     """
-    Leakage-free PyTorch Dataset for joint intent and slot training.
+    Prepare valid MASSIVE records for joint intent and slot training.
+
+    Split integrity is checked during preparation, not by this Dataset.
     """
 
     def __init__(
