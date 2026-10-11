@@ -5,6 +5,25 @@ evaluation output and Optuna logs are unavailable. A separately supplied
 checkpoint has not been linked to these results; retraining does not recreate
 the original experiment automatically.
 
+## Training and metric definitions
+
+The encoder is `dbmdz/bert-base-turkish-cased`. Defaults in
+`configs/joint_bert.yaml` are maximum length 64, batch size 16, up to ten epochs,
+AdamW learning rate `3e-5`, weight decay 0.01, warmup 15%, gradient clipping 1.0,
+dropout 0.12 and seed 42. Normal training selects the lowest average validation
+batch loss with patience three. AMP, class weights and label smoothing are off.
+Intent loss plus 1.5 times slot loss trains the shared encoder and classifiers;
+slot padding uses ignore index `-100`.
+
+Intent evaluation reports accuracy and weighted precision/recall/F1, rather
+than macro-F1. Slot evaluation uses entity-level `seqeval` precision/recall/F1
+and secondary token accuracy excluding ignored labels. It uses token argmax,
+not the API's entity decoder.
+
+Optional Optuna search uses ten trials, four epochs per trial, batch size 16,
+AMP off, warmup 0.1, TPE sampling and MedianPruner. Selection maximizes
+validation entity-level slot F1. It saves `configs/joint_bert_best.yaml`.
+
 ## Recorded model values
 
 | Version | Reported split | Intent weighted-F1 | Slot entity F1 | Slot precision | Slot recall |

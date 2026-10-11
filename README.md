@@ -1,215 +1,123 @@
 # Turkish Joint NLU with BERTurk
 
-A joint model for **Turkish intent classification and slot filling**. One BERTurk encoder feeds two classifiers. The repository includes training, evaluation, optional Optuna search, terminal inference and a local FastAPI interface.
-
 ## Overview
 
-The input is a Turkish utterance such as `yarın sabah yediye alarm kur`. The outputs are an intent label, its model confidence and entity spans such as `date` and `time`. The project uses the Turkish `tr-TR` portion of Amazon MASSIVE and `dbmdz/bert-base-turkish-cased`.
+Predict the **intent and entity spans** of a Turkish sentence with one shared
+BERTurk encoder. For example, an alarm request can produce `alarm_set` together
+with its date and time. This is a supervised model study with terminal inference
+and a local FastAPI demo.
 
-Preparation preserves the official train/validation/test partitions. It checks expected row counts and overlapping row IDs; this is useful protection, but it does not prove that every possible form of leakage is absent.
-
-## Scope and limitations
-
-- This is a supervised NLU study and local inference demo, with a fixed intent and slot vocabulary.
-- A valid API response does not establish production readiness or robustness on arbitrary Turkish input.
-- Inference truncates at 64 tokenizer tokens. Confidence is the intent softmax score, not calibrated certainty.
-- The trained checkpoint is not included in the source checkout. A separately supplied checkpoint has not been linked to the historical metrics.
-- API and CLI use different BIO decoding rules. Entity spans can differ on consecutive subwords.
-- Historical test results have already been inspected. Running the same test again is a historical re-evaluation, not a new unseen evaluation.
-
-## Architecture and workflow
-
-```mermaid
-flowchart TD
-    A[Annotated MASSIVE text] --> B[Clean text and character spans]
-    B --> C[BERTurk tokenizer and offsets]
-    C --> D[BIO labels aligned to tokens]
-    C --> E[BERTurk encoder]
-    E --> F[First-token hidden state: intent classifier]
-    E --> G[Token hidden states: slot classifier]
-    D --> H[Joint cross-entropy loss during training]
-    F --> H
-    G --> H
-    F --> I[Intent argmax and softmax confidence]
-    G --> J[Token argmax and BIO entity decoding]
-```
-
-The intent head uses `last_hidden_state[:, 0, :]`; it does **not** use BERT's separate `pooler_output`. The encoder has 12 layers and 768 hidden dimensions. The intent head has 60 outputs. There are 55 raw slot types, represented by **111 BIO labels**: `O`, plus `B-` and `I-` for each type.
+## How it works
 
 ```text
-total_loss = intent_cross_entropy + lambda_slot * slot_cross_entropy
-lambda_slot = 1.5
-slot_padding_ignore_index = -100
+Turkish sentence -> BERTurk tokenizer -> shared BERTurk encoder
+                                      -> intent classifier
+                                      -> token classifier -> entity spans
 ```
+
+The intent classifier reads the first token's hidden state. The slot classifier
+labels each token using BIO notation: beginning, inside or outside an entity.
+Training combines intent cross-entropy with slot cross-entropy, weighted by 1.5.
+Padding labels are ignored. The encoder has 12 layers and 768 hidden dimensions;
+it is fine-tuned together with both classifiers.
+
+## Data and evaluation
+
+The Turkish `tr-TR` portion of **Amazon MASSIVE** supplies the annotated text.
+The official partitions are retained: **11,514 train**, **2,033 validation** and
+**2,974 test** sentences. There are **60 intents** and **55 slot types**, encoded
+as **111 BIO labels**. Preparation checks row counts and overlapping row IDs.
+
+Normal training selects the lowest validation loss. Final intent results use
+weighted-F1; slot results use entity-level F1 with `seqeval`. These are different
+measurements, and neither is the same as token accuracy.
+
+## Recorded results
+
+| Model | Reported split | Intent weighted-F1 | Slot entity F1 |
+|---|---|---:|---:|
+| Earlier v1 reference | Test | 87.54% | 73.94% |
+| v3 | Test | 87.99% | 74.16% |
+| Best recorded Optuna trial | Validation | — | 68.75% |
+
+The v3 changes were a larger slot-loss weight, longer warmup and slightly more
+dropout. They changed together; the small gains cannot be attributed to one
+setting. The Optuna validation score cannot be compared directly with test F1.
+
+These are historical documented results. Complete evaluation logs are unavailable,
+and a separately supplied checkpoint has not been linked to these scores.
+[Experiment details](reports/HISTORICAL_RESULTS.md) retain the additional metrics,
+settings and trial observations.
 
 ## Project layout
 
-```text
-berturk-massive-nlu/
-├── src/                         # Data, model, training and inference
-│   ├── data/                    # Parsing, alignment, JSONL, mappings, Dataset
-│   ├── modeling/                # Joint neural model and loss
-│   ├── training/                # Training epochs and optional Optuna search
-│   ├── evaluation/              # Existing test metric calculation
-│   └── inference/               # API predictor and original CLI decoder
-├── scripts/                     # python -m scripts.<command> entry points
-├── api/app.py                   # Thin FastAPI interface
-├── configs/joint_bert.yaml       # Used model/training/loss settings
-├── data/raw/                    # Official JSONL partitions
-├── data/processed/              # Intent and BIO ID mappings
-├── reports/                     # Recorded experiment results
-├── docs/                        # API request and response examples
-├── pyproject.toml
-└── requirements.txt
-```
-
-`data/prepare_dataset.py` and the original misspelled `scripts/evaulate_model.py` remain compatibility entry points. Generated `checkpoints/` is not a versioned model artifact.
-
-## Data and artifacts
-
-| Item | Location / meaning |
+| Path | Purpose |
 |---|---|
-| Train | `data/raw/train.jsonl`, 11,514 expected rows |
-| Validation | `data/raw/validation.jsonl`, 2,033 expected rows |
-| Test | `data/raw/test.jsonl`, 2,974 expected rows |
-| Intents | `data/processed/intent_to_id.json`, 60 IDs |
-| Slots | `data/processed/slot_to_id.json`, 111 BIO IDs |
-| Model config | `configs/joint_bert.yaml` |
-| Training/API/evaluation checkpoint | `checkpoints/best_joint_nlu_model.pt`, externally supplied |
-| Original CLI checkpoint | `best_joint_nlu_model.pt` in repo root, externally supplied |
-| Historical result record | [reports/HISTORICAL_RESULTS.md](reports/HISTORICAL_RESULTS.md) |
+| `src/data/` | Text preparation, token alignment and dataset loading |
+| `src/modeling/` | Shared encoder, two classifiers and loss |
+| `src/training/`, `src/evaluation/` | Training, optional search and metrics |
+| `src/inference/`, `api/app.py` | Terminal prediction and local API |
+| `scripts/` | Commands that call the implementation |
+| `configs/joint_bert.yaml` | Model and training settings |
+| `data/raw/`, `data/processed/` | Official partitions and label-to-ID mappings |
+| `reports/`, `docs/` | Recorded results and API examples |
 
-The commands use different checkpoint paths. Supply the same model file at
-the path required by each command. Retraining does not recreate identical
-historical weights.
-
-Preparation commands can overwrite the supplied data and label mappings.
-They are not required before every evaluation.
+The mapping JSON files translate model output positions into label names.
+The YAML file holds settings; neither file is an additional model.
 
 ## Setup
 
-Python 3.10+ is required. A GPU is optional. The historical training estimates
-use an RTX 3050 laptop with 4 GB VRAM.
+Python **3.10+** is required. From the repository root:
 
 ```bash
-git clone https://github.com/YavuzahmetR/berturk-massive-nlu.git
-cd berturk-massive-nlu
 python -m venv .venv
-# Linux/macOS: source .venv/bin/activate
-# PowerShell: .\.venv\Scripts\Activate.ps1
-python -m pip install -e "."
+# Activate: Windows .venv\Scripts\Activate.ps1; macOS/Linux source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` is the alternative dependency list. Install a compatible PyTorch build for your device if needed. Neither declaration locks the original training environment, so a fresh install is not an exact recreation of that experiment. Preparation needs `datasets`. Model/tokenizer access or a matching cache is required for the original `from_pretrained` calls.
+Use a PyTorch build compatible with your device. Model/tokenizer access or a
+matching local cache is needed for `dbmdz/bert-base-turkish-cased`. Dependencies
+are not locked to the original training environment.
 
-Run commands from the repo root. Original relative artifact paths are retained.
+The checkpoint is **not included** in Git. The API, training and evaluation use
+`checkpoints/best_joint_nlu_model.pt`; the original terminal command instead uses
+`best_joint_nlu_model.pt` in the repository root. Supply the same weights at the
+path required by each command. Training again will not recreate identical weights.
 
 ## Usage
 
-### Data preparation, when explicitly needed
-
-```bash
-python -m scripts.prepare_data
-python -m scripts.generate_slot_mapping
-```
-
-These fetch and verify official partitions, save JSONL files, and derive BIO IDs from training metadata. Existing compatibility command: `python -m data.prepare_dataset`.
-
-### Training
-
-```bash
-python -m scripts.train
-python -m scripts.train --config configs/joint_bert.yaml
-```
-
-Saves the state with the lowest validation loss. Historical runtime estimate: 10–12 minutes on the author's RTX 3050 laptop; not a runtime guarantee.
-
-### Evaluation
-
-```bash
-python -m scripts.evaluate_model
-```
-
-Prints test metrics and per-class reports. The compatibility command
-`python -m scripts.evaulate_model` is also supported.
-
-### Terminal inference
-
 ```bash
 python -m scripts.predict "yarın sabah yediye alarm kurar mısın"
-python -m scripts.predict
-```
-
-The second opens interactive input. Enter `q`, `quit` or `exit` to leave.
-This command loads the checkpoint from the repo root.
-
-### Local API
-
-```bash
 uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
 ```
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/` | Service information |
-| GET | `/health` | Load status, device and label counts |
-| POST | `/predict` | One sentence |
-| POST | `/predict/batch` | Up to 64 sentences |
+Open [http://localhost:8000/docs](http://localhost:8000/docs) to try `/predict` or
+`/predict/batch`. Requests, illustrative outputs and input limits are in
+[API_EXAMPLES.md](docs/API_EXAMPLES.md).
 
-Swagger UI: `http://localhost:8000/docs`. Responses retain `text`, `intent`, `confidence`, `entities`; batches retain `results` and `count`. The model loads once on startup. An empty single-sentence request returns validation error 422. [API requests and Python client](docs/API_EXAMPLES.md) are illustrations, not fresh measurements.
-
-Single requests require 1–512 characters. Batches require 1–64 items, but their
-items do not share the single-request length rule. Entity offsets use an
-exclusive end: `text[start:end]`. Tokenization truncates at 64 tokens; the
-response retains the original text without a truncation flag.
-
-Missing checkpoint, configuration or encoder/tokenizer assets prevent startup.
-A missing predictor returns HTTP 503; inference exceptions return HTTP 500.
-The OpenAPI version identifies the service, not the trained model.
-
-### Optional Optuna study
+Training and evaluation are separate commands:
 
 ```bash
+python -m scripts.train --config configs/joint_bert.yaml
+python -m scripts.evaluate_model
 python -m scripts.tune
 ```
 
-Runs 10 trials and saves `configs/joint_bert_best.yaml`. Historical runtime estimate: 40–50 minutes. Search evaluates **validation entity-level slot F1**, uses four epochs per trial, batch size 16, AMP off, warmup ratio 0.1, TPE sampling and MedianPruner. These settings differ from normal ten-epoch training.
+Optuna is optional and runs ten trials. Data preparation is only needed when
+rebuilding inputs: `python -m scripts.prepare_data`, then
+`python -m scripts.generate_slot_mapping`. These commands can overwrite the
+supplied partitions and mappings. Run all commands from the repository root.
+The older misspelled evaluation command remains a compatibility entry point.
 
-## Evaluation protocol
+## Limitations
 
-| Stage | Selection or metric |
-|---|---|
-| Normal training | Lowest average validation batch loss; patience 3 |
-| Optuna search | Highest validation entity-level slot F1 |
-| Final intent evaluation | Accuracy, **weighted** precision/recall/F1; per-class report |
-| Final slot evaluation | Entity-level precision/recall/F1 with `seqeval` |
-| Secondary slot measure | Token accuracy excluding labels `-100` |
+- Fixed vocabulary: unfamiliar requests still receive one of the known intents.
+- Inputs are truncated at 64 tokenizer tokens. Intent confidence is an
+  uncalibrated softmax score, not a guarantee of correctness.
+- API and terminal BIO decoding differ, so some consecutive subword spans differ.
+- The test split has already been inspected; reuse is historical re-evaluation.
+- No uncertainty estimate, arbitrary-input robustness or production deployment
+  claim is made. Missing model assets prevent API startup.
 
-Intent weighted-F1 is not macro-F1. Slot entity F1 is not token accuracy. Validation search and test results must remain separate. Evaluation uses token argmax and ignores padding/special labels; it does not use the API's entity decoder to calculate `seqeval` F1.
-
-Default settings: dropout 0.12, maximum length 64, batch size 16, up to 10 epochs,
-AdamW learning rate `3e-5`, weight decay 0.01, warmup 15%, maximum gradient norm
-1.0, seed 42. AMP, class weights and label smoothing are off.
-
-## Results and interpretation
-
-These values were **reported in the original documentation**. Complete
-evaluation output is unavailable, and a supplied checkpoint has not been
-linked to these scores.
-
-| Historical version | Split | Intent weighted-F1 | Slot entity F1 | Slot precision | Slot recall |
-|---|---|---|---|---|---|
-| v1 reference model | Reported test | 87.54% | 73.94% | 72.25% | 75.70% |
-| v3 model | Reported test | 87.99% | 74.16% | 72.34% | 76.06% |
-| Optuna best trial | Validation search | — | 68.75% | — | — |
-
-Reported v3 gains: intent +0.45 percentage points, slot +0.22 points. Original v3 example also records intent accuracy 88.03% and slot token accuracy 90.54%. No uncertainty estimates are stored. v1 is an earlier neural reference, not a classical baseline.
-
-Reported v3 changes: slot-loss weight `1.0 → 1.5`, warmup `0.1 → 0.15`, dropout `0.1 → 0.12`. Proposed explanations for them are training hypotheses rather than isolated causal findings.
-
-The Optuna score is on validation and cannot be directly compared with the v1
-test score. [Recorded experiment results](reports/HISTORICAL_RESULTS.md) include
-individual trial scores, configuration changes and interpretation limits.
-
-Data: Amazon MASSIVE. Encoder: BERTurk (`dbmdz`). Libraries include Hugging Face
-Transformers, PyTorch, Optuna and FastAPI. No repository license file is present.
+Data: Amazon MASSIVE. Encoder: BERTurk (`dbmdz`). Main libraries: PyTorch,
+Transformers, `seqeval`, Optuna and FastAPI. No repository license file is present.
