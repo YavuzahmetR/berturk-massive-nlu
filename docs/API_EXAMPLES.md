@@ -1,8 +1,10 @@
 # API usage examples
 
-These request/response illustrations were retained from the original README. They are not fresh inference results or guarantees of exact predictions. The artist example's character end offset and BIO label count were corrected to match the literal example/mapping. Runtime response semantics are unchanged. `num_slots` counts BIO classifier labels (111), not raw slot types (55).
+These are illustrative responses, not guarantees of exact predictions.
+Entity end offsets are exclusive: `text[start:end]`. `num_slots` counts BIO
+classifier labels (111), not raw slot types (55).
 
-### 4. REST API
+## Start the API
 
 ```bash
 uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
@@ -21,7 +23,7 @@ uvicorn api.app:app --reload --host 127.0.0.1 --port 8000
 
 ---
 
-#### 🩺 `GET /health` — Health Check
+## Health check
 
 ```bash
 curl http://localhost:8000/health
@@ -40,7 +42,7 @@ curl http://localhost:8000/health
 
 ---
 
-#### 🎯 `POST /predict` — Single Sentence
+## Single-sentence prediction
 
 **Request:**
 
@@ -136,7 +138,7 @@ curl -X POST http://localhost:8000/predict \
 
 ---
 
-#### 📦 `POST /predict/batch` — Batch Inference
+## Batch prediction
 
 **Request:**
 
@@ -191,7 +193,7 @@ curl -X POST http://localhost:8000/predict/batch \
 
 ---
 
-#### ⚠️ Error Response — Empty Input
+## Empty-input error
 
 **Request:**
 
@@ -218,7 +220,7 @@ curl -X POST http://localhost:8000/predict \
 
 ---
 
-#### 🐍 Python Client Example
+## Python client
 
 ```python
 import requests

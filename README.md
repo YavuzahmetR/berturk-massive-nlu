@@ -14,7 +14,7 @@ Preparation preserves the official train/validation/test partitions. It checks e
 - A valid API response does not establish production readiness or robustness on arbitrary Turkish input.
 - Inference truncates at 64 tokenizer tokens. Confidence is the intent softmax score, not calibrated certainty.
 - The trained checkpoint is not included in the source checkout. A separately supplied checkpoint has not been linked to the historical metrics.
-- API and CLI preserve their original, different BIO decoding rules. Entity spans can differ on consecutive subwords. Their different decoding behavior is part of the current interfaces.
+- API and CLI use different BIO decoding rules. Entity spans can differ on consecutive subwords.
 - Historical test results have already been inspected. Running the same test again is a historical re-evaluation, not a new unseen evaluation.
 
 ## Architecture and workflow
@@ -55,9 +55,9 @@ berturk-massive-nlu/
 ├── scripts/                     # python -m scripts.<command> entry points
 ├── api/app.py                   # Thin FastAPI interface
 ├── configs/joint_bert.yaml       # Used model/training/loss settings
-├── data/raw/                    # Unchanged official JSONL partitions
-├── data/processed/              # Unchanged intent and BIO ID mappings
-├── reports/                     # Recorded historical result provenance
+├── data/raw/                    # Official JSONL partitions
+├── data/processed/              # Intent and BIO ID mappings
+├── reports/                     # Recorded experiment results
 ├── docs/                        # API request and response examples
 ├── pyproject.toml
 └── requirements.txt
@@ -79,9 +79,12 @@ berturk-massive-nlu/
 | Original CLI checkpoint | `best_joint_nlu_model.pt` in repo root, externally supplied |
 | Historical result record | [reports/HISTORICAL_RESULTS.md](reports/HISTORICAL_RESULTS.md) |
 
-The two checkpoint paths are an existing inconsistency. No fallback was added, because it could silently select a different model. Use the same externally supplied checkpoint bytes at the path required by the command. Retraining does not recreate identical historical weights.
+The commands use different checkpoint paths. Supply the same model file at
+the path required by each command. Retraining does not recreate identical
+historical weights.
 
-Raw records and label mappings are retained byte-for-byte. Preparation commands can overwrite them, so they are for deliberate data preparation, not a required step before every evaluation.
+Preparation commands can overwrite the supplied data and label mappings.
+They are not required before every evaluation.
 
 ## Setup
 
@@ -127,7 +130,8 @@ Saves the state with the lowest validation loss. Historical runtime estimate: 10
 python -m scripts.evaluate_model
 ```
 
-Corrected spelling is available; `python -m scripts.evaulate_model` stays supported. Prints test metrics and per-class reports; it does not currently export a machine-readable release report.
+Prints test metrics and per-class reports. The compatibility command
+`python -m scripts.evaulate_model` is also supported.
 
 ### Terminal inference
 
@@ -136,7 +140,8 @@ python -m scripts.predict "yarın sabah yediye alarm kurar mısın"
 python -m scripts.predict
 ```
 
-The second opens interactive input. Enter `q`, `quit` or `exit` to leave. This command preserves the legacy root checkpoint path and CLI decoder.
+The second opens interactive input. Enter `q`, `quit` or `exit` to leave.
+This command loads the checkpoint from the repo root.
 
 ### Local API
 
@@ -160,8 +165,7 @@ response retains the original text without a truncation flag.
 
 Missing checkpoint, configuration or encoder/tokenizer assets prevent startup.
 A missing predictor returns HTTP 503; inference exceptions return HTTP 500.
-Prediction responses do not include a checkpoint version or hash; the OpenAPI
-version identifies the service.
+The OpenAPI version identifies the service, not the trained model.
 
 ### Optional Optuna study
 
@@ -183,11 +187,15 @@ Runs 10 trials and saves `configs/joint_bert_best.yaml`. Historical runtime esti
 
 Intent weighted-F1 is not macro-F1. Slot entity F1 is not token accuracy. Validation search and test results must remain separate. Evaluation uses token argmax and ignores padding/special labels; it does not use the API's entity decoder to calculate `seqeval` F1.
 
-Unchanged supplied settings: dropout 0.12, maximum length 64, batch size 16, up to 10 epochs, AdamW learning rate `3e-5`, weight decay 0.01, warmup 15%, maximum gradient norm 1.0, seed 42. AMP, class weights and label smoothing are off. Supported code paths do not mean they were enabled in the recorded final experiment.
+Default settings: dropout 0.12, maximum length 64, batch size 16, up to 10 epochs,
+AdamW learning rate `3e-5`, weight decay 0.01, warmup 15%, maximum gradient norm
+1.0, seed 42. AMP, class weights and label smoothing are off.
 
 ## Results and interpretation
 
-These values were **reported by the original README**, not linked to an original checkpoint hash or full saved evaluation output:
+These values were **reported in the original documentation**. Complete
+evaluation output is unavailable, and a supplied checkpoint has not been
+linked to these scores.
 
 | Historical version | Split | Intent weighted-F1 | Slot entity F1 | Slot precision | Slot recall |
 |---|---|---|---|---|---|
@@ -199,9 +207,9 @@ Reported v3 gains: intent +0.45 percentage points, slot +0.22 points. Original v
 
 Reported v3 changes: slot-loss weight `1.0 → 1.5`, warmup `0.1 → 0.15`, dropout `0.1 → 0.12`. Proposed explanations for them are training hypotheses rather than isolated causal findings.
 
-Optuna history: trial 0 validation slot F1 0.6875 (`lr=1.8e-5`, dropout 0.29, no weights), trial 1 0.1793 (both weights), trial 2 0.6404 (`lr=1.4e-5`, dropout 0.10), trials 3–6 pruned. One weak trial does not show that class weights always fail. Label smoothing in the current loss applies to **intent**, not directly to slots. Current search optimizes validation slot F1; the old claim that it used validation loss is inaccurate for this source.
-
-Search 0.6875 cannot be fairly compared with v1 **test** 0.7394. Full trial logs, original checkpoints and their hashes are absent. [Historical provenance](reports/HISTORICAL_RESULTS.md) retains the numbers and remaining limits.
+The Optuna score is on validation and cannot be directly compared with the v1
+test score. [Recorded experiment results](reports/HISTORICAL_RESULTS.md) include
+individual trial scores, configuration changes and interpretation limits.
 
 Data: Amazon MASSIVE. Encoder: BERTurk (`dbmdz`). Libraries include Hugging Face
 Transformers, PyTorch, Optuna and FastAPI. No repository license file is present.
